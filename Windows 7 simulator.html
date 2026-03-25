@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Windows 7 Ultimate</title>
+  <style>
+    body { 
+      margin: 0; 
+      height: 100vh; 
+      font-family: 'Segoe UI', sans-serif; 
+      background: url('https://4kwallpapers.com/images/walls/thumbs_3t/13944.jpg') no-repeat center center fixed; 
+      background-size: cover; 
+      overflow: hidden; 
+    }
+
+    /* Desktop Icons Area */
+    #desktop-icons { padding: 20px; display: flex; flex-direction: column; flex-wrap: wrap; height: 90vh; align-content: flex-start; }
+    .icon { width:80px; text-align:center; color:white; margin-bottom:25px; cursor:pointer; text-shadow: 1px 1px 3px black; transition: 0.1s; padding: 5px; user-select: none; }
+    .icon:hover { background: rgba(255,255,255,0.2); border-radius: 4px; }
+    .icon img { width:48px; height:48px; display:block; margin:auto; margin-bottom: 5px; }
+
+    /* Taskbar */
+    #taskbar { position:fixed; bottom:0; left:0; width:100%; height:40px; background: rgba(20, 20, 20, 0.85); backdrop-filter: blur(8px); border-top:1px solid #555; display:flex; align-items:center; padding:0 10px; z-index: 9999; }
+    #start-btn { width:36px; height:36px; background: #0078d7; border-radius: 50%; box-shadow: 0 0 8px white; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Windows_logo_-_2012_derivative.svg/1200px-Windows_logo_-_2012_derivative.svg.png'); background-size: 70%; background-position: center; background-repeat: no-repeat; cursor:pointer; margin-right:15px; }
+    .task-shortcut { width: 34px; height: 34px; margin-right: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px; }
+    .task-shortcut:hover { background: rgba(255,255,255,0.3); }
+    .task-shortcut img { width: 26px; height: 26px; }
+    
+    /* Tray Clock */
+    #tray { margin-left: auto; color: white; font-size: 12px; text-align: center; padding-right: 5px; cursor: default; }
+
+    /* Start Menu */
+    .start-menu { position: absolute; bottom: 42px; left: 5px; width: 350px; height: 480px; background: rgba(245, 245, 245, 0.98); border: 1px solid #004d99; border-radius: 5px 5px 0 0; display: none; flex-direction: row; box-shadow: 0 0 25px rgba(0,0,0,0.6); z-index: 10000; }
+    .start-left { flex: 1.5; background: white; display: flex; flex-direction: column; }
+    .start-right { flex: 1; background: #e4eef7; border-left: 1px solid #c0cddb; padding: 15px 10px; display: flex; flex-direction: column; gap: 10px; font-size: 12px; }
+    .start-right-item { cursor: pointer; color: #333; }
+    .start-right-item:hover { text-decoration: underline; }
+    .start-user { background: linear-gradient(to right, #1e3a5f, #3a6ea5); color: white; padding: 12px; font-weight: bold; }
+    .apps-container { flex: 1; padding: 5px; overflow-y: auto; }
+    .menu-item { padding: 8px; display: flex; align-items: center; cursor: pointer; font-size: 13px; gap: 10px; color: #333;}
+    .menu-item:hover { background: #3a6ea5; color: white; }
+    .menu-item img { width: 24px; height: 24px; }
+    .search-box { padding: 10px; background: #e0e0e0; border-top: 1px solid #ccc; }
+    #appSearch { width: 90%; padding: 6px; border: 1px solid #999; border-radius: 2px; outline: none; }
+
+    /* Windows Styling */
+    .window { position:absolute; top:80px; left:150px; width:650px; height:450px; background:white; border:1px solid #666; box-shadow:0 10px 30px rgba(0,0,0,0.4); display:none; flex-direction: column; z-index: 100; border-radius: 6px 6px 0 0; }
+    .window-header { background: linear-gradient(to bottom, #f0f0f0, #ccc); color:#222; padding:8px 10px; display:flex; justify-content:space-between; align-items:center; cursor: move; font-weight: bold; border-bottom: 1px solid #999; user-select: none; }
+    .win-controls { display: flex; gap: 5px; }
+    .win-btn { width: 25px; height: 25px; text-align: center; line-height: 25px; cursor: pointer; border-radius: 3px; font-weight: bold; font-family: sans-serif; }
+    .min-btn { background: #bbb; color: black; }
+    .max-btn { background: #bbb; color: black; }
+    .close-btn { background:#e04343; color: white; }
+    .window-body { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+    textarea { flex: 1; border: none; padding: 15px; outline: none; resize: none; font-size: 15px; }
+
+    /* Explorer Content Styling */
+    .explorer-sidebar { width: 150px; background: #f0f0f0; border-right: 1px solid #ccc; padding: 10px; font-size: 13px; color: #333; }
+    .explorer-main { flex: 1; padding: 20px; display: flex; flex-wrap: wrap; gap: 20px; align-content: flex-start; overflow-y: auto; }
+    .file-item { width: 80px; text-align: center; font-size: 12px; cursor: pointer; color: #333; padding: 5px; user-select: none; }
+    .file-item img { width: 40px; height: 40px; display: block; margin: 0 auto 5px; }
+    .file-item:hover { background: #e5f3ff; border: 1px solid #99d1ff; border-radius: 3px; }
+    
+    .drive-section { width: 100%; font-weight: bold; font-size: 13px; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 10px; color: #333; }
+
+    /* CMD Specific */
+    .cmd-body { background: black; color: #0f0; font-family: 'Consolas', monospace; padding: 10px; flex: 1; overflow-y: auto; }
+    .cmd-line { display: flex; gap: 5px; }
+    .cmd-input { background: transparent; border: none; color: inherit; outline: none; flex: 1; font-family: inherit; }
+
+    /* Browser */
+    .browser-bar { background: #e1e1e1; padding: 5px; display: flex; gap: 10px; border-bottom: 1px solid #aaa; }
+    .browser-input { flex: 1; padding: 5px; border: 1px solid #999; }
+
+    /* 🎵 Music Player */
+    .music-player-bg { flex: 1; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; text-shadow: 1px 1px 4px black; }
+    .music-disc { width: 120px; height: 120px; background: url('https://img.icons8.com/color/96/cd--v1.png') center/cover; border-radius: 50%; box-shadow: 0 0 20px rgba(0,0,0,0.6); animation: spin 3s linear infinite paused; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .music-controls { margin-top: 30px; display: flex; gap: 20px; }
+    .music-control-btn { background: #0078d7; border: none; padding: 10px 20px; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; }
+    .music-control-btn:hover { background: #0056b3; }
+
+    /* 🎮 Game Style (Tic Tac Toe) */
+    .game-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #e9ecef; }
+    .board { display: grid; grid-template-columns: repeat(3, 100px); grid-template-rows: repeat(3, 100px); gap: 5px; background: #343a40; padding: 5px; border-radius: 8px; }
+    .cell { background: white; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold; cursor: pointer; user-select: none; }
+    .cell:hover { background: #f8f9fa; }
+    .cell.x { color: #d9534f; }
+    .cell.o { color: #5bc0de; }
+    .game-status { margin-bottom: 15px; font-size: 1.2rem; font-weight: bold; color: #333; }
+    .reset-game { margin-top: 15px; padding: 8px 20px; background: #0078d7; color: white; border: none; border-radius: 4px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <div id="desktop">
+    <div id="desktop-icons">
+        <div class="icon" onclick="openWin('computer')"><img src="https://img.icons8.com/color/96/monitor.png">My Computer</div>
+        <div class="icon" onclick="openWin('recycle')"><img src="https://img.icons8.com/color/96/trash.png">Recycle Bin</div>
+        <div class="icon" onclick="openWin('explorer')"><img src="https://img.icons8.com/color/96/folder-invoices--v1.png">Explorer</div>
+        <div class="icon" onclick="openWin('word')"><img src="https://img.icons8.com/color/96/microsoft-word-2019--v2.png">Word</div>
+        <div class="icon" onclick="openWin('cmd')"><img src="https://img.icons8.com/color/96/console.png">CMD</div>
+        <div class="icon" onclick="openWin('paint')"><img src="https://img.icons8.com/color/96/paint-palette.png">Paint</div>
+        <div class="icon" onclick="openWin('notepad')"><img src="https://img.icons8.com/color/96/notepad.png">Notepad</div>
+        <div class="icon" onclick="openWin('browser')"><img src="https://img.icons8.com/color/96/internet-explorer.png">Internet</div>
+        <div class="icon" onclick="openWin('music')"><img src="https://img.icons8.com/color/96/music.png">Media Player</div>
+        <div class="icon" onclick="openWin('tictactoe')"><img src="https://img.icons8.com/color/96/controller.png">TicTacToe Game</div>
+    </div>
+
+    <div id="taskbar">
+        <div id="start-btn" onclick="toggleStart(event)"></div>
+        <div class="task-shortcut" onclick="openWin('computer')"><img src="https://img.icons8.com/color/48/monitor.png"></div>
+        <div class="task-shortcut" onclick="openWin('explorer')"><img src="https://img.icons8.com/color/48/folder-invoices--v1.png"></div>
+        <div class="task-shortcut" onclick="openWin('tictactoe')"><img src="https://img.icons8.com/color/48/controller.png"></div>
+        <div class="task-shortcut" onclick="openWin('notepad')"><img src="https://img.icons8.com/color/48/notepad.png"></div>
+        <div class="task-shortcut" onclick="openWin('music')"><img src="https://img.icons8.com/color/96/music.png"></div>
+
+        <div id="tray">
+            <div id="time"></div>
+            <div id="date" style="font-size: 10px;"></div>
+        </div>
+
+        <div id="start-menu" class="start-menu" onclick="event.stopPropagation()">
+            <div class="start-left">
+                <div class="start-user">Administrator</div>
+                <div class="apps-container">
+                    <div class="menu-item" onclick="openWin('computer')"><img src="https://img.icons8.com/color/48/monitor.png"> Computer</div>
+                    <div class="menu-item" onclick="openWin('explorer')"><img src="https://img.icons8.com/color/48/folder-invoices--v1.png"> File Explorer</div>
+                    <div class="menu-item" onclick="openWin('tictactoe')"><img src="https://img.icons8.com/color/48/controller.png"> Tic Tac Toe</div>
+                    <div class="menu-item" onclick="openWin('music')"><img src="https://img.icons8.com/color/48/music.png"> Media Player</div>
+                    <div class="menu-item" onclick="openWin('paint')"><img src="https://img.icons8.com/color/48/paint-palette.png"> Paint</div>
+                    <div class="menu-item" onclick="openWin('notepad')"><img src="https://img.icons8.com/color/48/notepad.png"> Notepad</div>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="appSearch" placeholder="Search programs..." oninput="searchApps()">
+                </div>
+            </div>
+            <div class="start-right">
+                <div class="start-right-item" onclick="openWin('explorer')">Documents</div>
+                <div class="start-right-item" onclick="openWin('computer')">Pictures</div>
+                <div class="start-right-item" onclick="openWin('tictactoe')">Games</div>
+                <div class="start-right-item" onclick="openWin('recycle')">Recycle Bin</div>
+                <hr style="width: 100%; border: 0.5px solid #bbb;">
+                <div class="start-right-item" style="font-weight:bold;" onclick="openWin('cpanel')">Control Panel</div>
+                <div class="start-right-item" onclick="openWin('devices')">Devices and Printers</div>
+                <div class="start-right-item" onclick="openWin('helpsupport')">Help and Support</div>
+                <div class="start-right-item" style="margin-top:auto; background:#d24726; color:white; padding:5px; text-align:center;" onclick="alert('Shutting down...')">Shut down</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tictactoe" class="window" onclick="bringToFront(this)">
+        <div class="window-header">Windows 7 Classic Gaming: Tic-Tac-Toe
+            <div class="win-controls">
+                <div class="win-btn min-btn" onclick="closeWin('tictactoe')">_</div>
+                <div class="win-btn max-btn" onclick="toggleMaximize('tictactoe')">□</div>
+                <div class="win-btn close-btn" onclick="closeWin('tictactoe')">×</div>
+            </div>
+        </div>
+        <div class="window-body">
+            <div class="game-body">
+                <div id="game-status" class="game-status">You are 'X'. It's your turn!</div>
+                <div class="board" id="board">
+                    <div class="cell" data-index="0" onclick="cellClicked(0)"></div>
+                    <div class="cell" data-index="1" onclick="cellClicked(1)"></div>
+                    <div class="cell" data-index="2" onclick="cellClicked(2)"></div>
+                    <div class="cell" data-index="3" onclick="cellClicked(3)"></div>
+                    <div class="cell" data-index="4" onclick="cellClicked(4)"></div>
+                    <div class="cell" data-index="5" onclick="cellClicked(5)"></div>
+                    <div class="cell" data-index="6" onclick="cellClicked(6)"></div>
+                    <div class="cell" data-index="7" onclick="cellClicked(7)"></div>
+                    <div class="cell" data-index="8" onclick="cellClicked(8)"></div>
+                </div>
+                <button class="reset-game" onclick="resetGame()">Restart Game</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="helpsupport" class="window" onclick="bringToFront(this)">
+        <div class="window-header">Windows Help and Support 
+            <div class="win-controls">
+                <div class="win-btn min-btn" onclick="closeWin('helpsupport')">_</div>
+                <div class="win-btn max-btn" onclick="toggleMaximize('helpsupport')">□</div>
+                <div class="win-btn close-btn" onclick="closeWin('helpsupport')">×</div>
+            </div>
+        </div>
+        <div class="window-body" style="padding: 20px; font-size: 14px; background: white; overflow-y:auto;">
+            <h2 style="color:#004d99;">Windows 7 Simulation Support</h2>
+            <hr>
+            <p><b>You can choose help topics:</b></p>
+            <ul>
+                <li>Now you can play Tic-Tac-Toe in OS games mode!</li>
+                <li>CMD now supports exit, date, and echo!</li>
+                <li>Double click on My Computer drives to open explorer!</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="cpanel" class="window" onclick="bringToFront(this)">
+        <div class="window-header">Control Panel 
+            <div class="win-controls">
+                <div class="win-btn min-btn" onclick="closeWin('cpanel')">_</div>
+                <div class="win-btn max-btn" onclick="toggleMaximize('cpanel')">□</div>
+                <div class="win-btn close-btn" onclick="closeWin('cpanel')">×</div>
+            </div>
+        </div>
+        <div class="window-body">
+            <div class="explorer-main" style="background:#f0f0f0;">
+                <div class="file-item"><img src="https://img.icons8.com/color/48/administrative-tools.png">System</div>
+                <div class="file-item"><img src="https://img.icons8.com/color/48/user.png">User Accounts</div>
+                <div class="file-item" onclick="openWin('devices')"><img src="https://img.icons8.com/color/48/print.png">Printers</div>
+            </div>
+        </div>
+    </div>
+	
+<ul id="context-menu" style="
+    position:absolute;
+    display:none;
+    background:#fff;
+    border:1px solid #333;
+    list-style:none;
+    padding:5px 0;
+    width:150px;
+    z-index:1000;">
+    <li>Create Text File</li>
+    <li>Create Folder</li>
+    <li>Create Image File</li>
+</ul>
+
+    <div id="devices" class="window" onclick="bringToFront(this)">
+        <div class="window-header">Devices and Printers 
+            <div class="win-controls">
+                <div class="win-btn min-btn" onclick="closeWin('devices')">_</div>
+                <div class="win-btn max-btn" onclick="toggleMaximize('devices')">□</div>
+                <div class="win-btn close-btn" onclick="closeWin('devices')">×</div>
+            </div>
+        </div>
+        <div class="window-body">
+            <div class="explorer-main">
+                <div class="drive-section">Devices (1)</div>
+                <div class="file-item"><img src="https://img.icons8.com/color/48/monitor.png">Desktop-PC</div>
+                
+                <div class="drive-section" style="margin-top: 20px;">Printers (1)</div>
+                <div class="file-item"><img src="https://img.icons8.com/color/48/print.png">HP LaserJet 7</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="computer" class="window" onclick="bringToFront(this)">
+        <div class="window-header">My Computer 
+            <div class="win-controls">
+                <div class="win-btn min-btn" onclick="closeWin('computer')">_</div>
+                <div class="win-btn max-btn" onclick="toggleMaximize('computer')">□</div>
+                <div class="win-btn close-btn" onclick="closeWin('computer')">×</div>
+            </div>
+        </div>
+        <div class="window-body" style="flex-direction: row;">
+            <div class="explorer-sidebar">
+                <b>Hard Drives</b><br><br>
+                <div style="cursor:pointer" ondblclick="showDir('docs')">💽 Local Disk (C:)</div>
+            </div>
+            <div class="explorer-main">
+                <div class="drive-section">Hard Disk Drives (1)</div>
+                <div class="file-item" ondblclick="showDir('docs')"><img src="data:image/jpeg;base64,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">Local Disk (C:)</div>
+            </div>
+        </div>
+    </div>
+	
+	<div id="context-menu" style="
+position:absolute;
+display:none;
+background:#f0f0f0;
+border:1px solid #999;
+width:180px;
+font-size:13px;
+box-shadow:0 0 10px rgba(0,0,0,0.3);
+z-index:20000;
+">
+    <div class="menu-item" onclick="createNewFile('folder')">📁 New Folder</div>
+    <div class="menu-item" onclick="createNewFile('txt')">📄 Text Document</div>
+    <div class="menu-item" onclick="createNewFile('docx')">📝 Word Document</div>
+</div>
+
+    <div id="explorer" class="window" onclick="bringToFront(this)">
+        <div class="window-header">File Explorer 
+            <div class="win-controls">
+                <div class="win-btn min-btn" onclick="closeWin('explorer')">_</div>
+                <div class="win-btn max-btn" onclick="toggleMaximize('explorer')">□</div>
+                <div class="win-btn close-btn" onclick="closeWin('explorer')">×</div>
+            </div>
+        </div>
+        <div class="window-body" style="flex-direction: row;">
+            <div class="explorer-sidebar">
+                <b>Favorites</b><br><br>
+                <div style="cursor:pointer" onclick="showDir('docs')">📄 Documents</div><br>
+                <div style="cursor:pointer" onclick="showDir('pics')">🎨 Pictures</div>
+            </div>
+            <div class="explorer-main" id="explorer-content"></div>
+        </div>
+    </div>
+
+    <div id="notepad" class="window" onclick="bringToFront(this)">
+        <div class="window-header">Notepad 
+            <div class="win-controls">
+                <div class="win-btn min-btn" onclick="closeWin('notepad')">_</div>
+                <div class="win-btn max-btn" onclick="toggleMaximize('notepad')">□</div>
+                <div class="win-btn close-btn" onclick="closeWin('notepad')">×</div>
+            </div>
+        </div>
+        <div class="window-body"><textarea id="notepad-text" placeholder="Type here. It auto-saves!"></textarea></div>
+    </div>
+
+    <div id="word" class="window" onclick="bringToFront(this)">
+        <div class="window-header" style="background: #2b579a; color: white;">Microsoft Word 
+            <div class="win-controls">
+                <div class="win-btn min-btn" onclick="closeWin('word')">_</div>
+                <div class="win-btn max-btn" onclick="toggleMaximize('word')">□</div>
+                <div class="win-btn close-btn" onclick="closeWin('word')">×</div>
+            </div>
+        </div>
+        <div class="window-body"><textarea id="word-text" placeholder="Start writing..."></textarea></div>
+    </div>
+
+    <div id="paint" class="window" onclick="bringToFront(this)">
+        <div class="window-header">Paint 
+            <div class="win-controls">
+                <div class="win-btn min-btn" onclick="closeWin('paint')">_</div>
+                <div class="win-btn max-btn" onclick="toggleMaximize('paint')">□</div>
+                <div class="win-btn close-btn" onclick="closeWin('paint')">×</div>
+            </div>
+        </div>
+        <div class="window-body"><canvas id="canv" width="630" height="380" style="background:white;"></canvas></div>
+    </div>
+
+    <div id="recycle" class="window" onclick="bringToFront(this)">
+        <div class="window-header">Recycle Bin 
+            <div class="win-controls">
+                <div class="win-btn min-btn" onclick="closeWin('recycle')">_</div>
+                <div class="win-btn max-btn" onclick="toggleMaximize('recycle')">□</div>
+                <div class="win-btn close-btn" onclick="closeWin('recycle')">×</div>
+            </div>
+        </div>
+        <div class="window-body" style="flex-direction: row;">
+            <div class="explorer-sidebar">
+                <button onclick="emptyRecycle()" style="cursor:pointer; width: 100%; padding: 5px;">Empty Bin</button>
+            </div>
+            <div class="explorer-main" id="recycle-content">
+                <div class="file-item"><img src="https://img.icons8.com/color/48/txt.png">Deleted_File.txt</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="browser" class="window" onclick="bringToFront(this)">
+        <div class="window-header" style="background: #0078d7; color: white;">Internet Explorer 
+            <div class="win-controls">
+                <div class="win-btn min-btn" onclick="closeWin('browser')">_</div>
+                <div class="win-btn max-btn" onclick="toggleMaximize('browser')">□</div>
+                <div class="win-btn close-btn" onclick="closeWin('browser')">×</div>
+            </div>
+        </div>
+        <div class="window-body">
+            <div class="browser-bar">
+                <button onclick="alert('Going Back')">←</button>
+                <input type="text" class="browser-input" value="https://www.google.com" id="browser-url">
+                <button onclick="browseSite()">Go</button>
+            </div>
+            <div id="browser-content" style="flex:1; background: white; padding: 20px; font-size: 20px; text-align: center;">
+                <h2 style="color: #4285F4;">Google Simulator</h2>
+                <input type="text" placeholder="Search Google..." style="width: 60%; padding: 10px; font-size: 16px;">
+            </div>
+        </div>
+    </div>
+
+    <div id="cmd" class="window" onclick="bringToFront(this)">
+        <div class="window-header" style="background: #333; color: white;">Command Prompt 
+            <div class="win-controls">
+                <div class="win-btn min-btn" onclick="closeWin('cmd')">_</div>
+                <div class="win-btn max-btn" onclick="toggleMaximize('cmd')">□</div>
+                <div class="win-btn close-btn" onclick="closeWin('cmd')">×</div>
+            </div>
+        </div>
+        <div class="window-body cmd-body" id="cmd-scroll" onclick="document.getElementById('cmd-in').focus()">
+            <div>Microsoft Windows [Version 6.1.7601]</div>
+            <div id="cmd-out"></div>
+            <div class="cmd-line"><span>C:\Users\Admin></span><input type="text" class="cmd-input" id="cmd-in" onkeydown="runCmd(event)" autocomplete="off"></div>
+        </div>
+    </div>
+
+    <div id="music" class="window" onclick="bringToFront(this)">
+        <div class="window-header" style="background: #1e3c72; color: white;">Windows Media Player
+            <div class="win-controls">
+                <div class="win-btn min-btn" onclick="closeWin('music')">_</div>
+                <div class="win-btn max-btn" onclick="toggleMaximize('music')">□</div>
+                <div class="win-btn close-btn" onclick="closeWin('music')">×</div>
+            </div>
+        </div>
+        <div class="window-body">
+            <div class="music-player-bg">
+                <div class="music-disc" id="music-disc"></div>
+                <h3 style="margin-top:20px;">Song-1.mp3</h3>
+                <div class="music-controls">
+                    <button class="music-control-btn" onclick="playMusic()">▶ Play</button>
+                    <button class="music-control-btn" style="background:#e04343;" onclick="pauseMusic()">⏸ Pause</button>
+                </div>
+                <audio id="audio-player" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
+            </div>
+        </div>
+    </div>
+
+  </div>
+
+  <script>
+    let topZ = 100;
+
+    const files = {
+        docs: [
+            { name: 'Document.docx', img: 'https://img.icons8.com/color/48/microsoft-word-2019--v2.png', target: 'word' },
+            { name: 'Notes.txt', img: 'https://img.icons8.com/color/48/txt.png', target: 'notepad' }
+        ],
+        pics: [
+            { name: 'Drawing.png', img: 'https://img.icons8.com/color/48/image.png', target: 'paint' }
+        ]
+    };
+
+    function bringToFront(el) {
+        topZ++;
+        el.style.zIndex = topZ;
+    }
+
+    function showDir(dir) {
+        openWin('explorer');
+        const container = document.getElementById('explorer-content');
+        container.innerHTML = '';
+        files[dir].forEach(f => {
+            container.innerHTML += `<div class="file-item" ondblclick="openWin('${f.target}')"><img src="${f.img}">${f.name}</div>`;
+        });
+    }
+
+    function emptyRecycle() {
+        document.getElementById('recycle-content').innerHTML = '<div style="padding:20px; color:#666;">This folder is empty.</div>';
+		
+		function restoreFile(index) {
+    let file = fileSystem.recycle.splice(index, 1)[0];
+    fileSystem.docs.push(file);
+    saveFS();
+    showRecycle();
+}
+    }
+
+    function browseSite() {
+        const url = document.getElementById('browser-url').value;
+        alert(`Browsing simulation for: ${url}`);
+    }
+
+    function playMusic() {
+        document.getElementById('audio-player').play();
+        document.getElementById('music-disc').style.animationPlayState = 'running';
+    }
+    
+    function pauseMusic() {
+        document.getElementById('audio-player').pause();
+        document.getElementById('music-disc').style.animationPlayState = 'paused';
+    }
+
+    function openWin(id) {
+        let w = document.getElementById(id);
+        w.style.display = 'flex';
+        bringToFront(w);
+        document.getElementById('start-menu').style.display = 'none';
+        if(id === 'explorer' && document.getElementById('explorer-content').innerHTML === '') showDir('docs');
+        if(id === 'cmd') setTimeout(() => document.getElementById('cmd-in').focus(), 50);
+    }
+    
+    function closeWin(id) { 
+        document.getElementById(id).style.display = 'none'; 
+        if(id === 'music') pauseMusic();
+        if(id === 'tictactoe') resetGame();
+    }
+
+    function toggleMaximize(id) {
+        let w = document.getElementById(id);
+        if (w.style.width === "100%") {
+            w.style.width = "650px";
+            w.style.height = "450px";
+            w.style.top = "80px";
+            w.style.left = "150px";
+        } else {
+            w.style.top = "0";
+            w.style.left = "0";
+            w.style.width = "100%";
+            w.style.height = "calc(100vh - 40px)";
+        }
+    }
+    
+    function toggleStart(e) {
+        e.stopPropagation();
+        let m = document.getElementById('start-menu');
+        m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+    function searchApps() {
+        let filter = document.getElementById('appSearch').value.toLowerCase();
+        let items = document.querySelectorAll('.menu-item');
+        items.forEach(it => it.style.display = it.innerText.toLowerCase().includes(filter) ? 'flex' : 'none');
+    }
+
+    function runCmd(e) {
+        if(e.key === 'Enter') {
+            let out = document.getElementById('cmd-out');
+            let input = document.getElementById('cmd-in');
+            let val = input.value.trim();
+            let lowerVal = val.toLowerCase();
+
+            out.innerHTML += `<div>C:\\Users\\Admin> ${val}</div>`;
+
+            if(lowerVal === 'cls') {
+                out.innerHTML = '';
+            } else if (lowerVal === 'exit') {
+                closeWin('cmd');
+            } else if (lowerVal === 'help') {
+                out.innerHTML += `<div>Commands: HELP, CLS, DIR, SYSTEMINFO, EXIT, ECHO, DATE, TIME</div>`;
+            } else if (lowerVal === 'dir') {
+                out.innerHTML += `<div>Directory of C:\\Users\\Admin<br><br>Desktop<br>Documents<br>Downloads</div>`;
+            } else if (lowerVal === 'date' || lowerVal === 'time') {
+                out.innerHTML += `<div>${new Date().toLocaleString()}</div>`;
+            } else if (lowerVal.startsWith('echo ')) {
+                out.innerHTML += `<div>${val.substring(5)}</div>`;
+            } else if (lowerVal === 'systeminfo') {
+                out.innerHTML += `<div>OS Name: Microsoft Windows 7 Ultimate Simulation</div>`;
+            } else if (val !== '') {
+                out.innerHTML += `<div>'${val}' is not recognized as an internal or external command.</div>`;
+            }
+
+            input.value = '';
+            document.getElementById('cmd-scroll').scrollTop = document.getElementById('cmd-scroll').scrollHeight;
+        }
+    }
+
+    /* Paint Logic */
+    let c = document.getElementById('canv'), ctx = c.getContext('2d'), draw = false;
+    c.onmousedown = (e) => { draw = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); };
+    c.onmousemove = (e) => { if(draw) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } };
+    window.onmouseup = () => draw = false;
+
+    /* 🚀 Tic Tac Toe Game Logic & UI State */
+    let gameState = ["", "", "", "", "", "", "", "", ""];
+    let isGameActive = true;
+    const winningConditions = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+        [0, 4, 8], [2, 4, 6]              // Diagonals
+    ];
+
+    function cellClicked(index) {
+        if (gameState[index] !== "" || !isGameActive) return;
+
+        gameState[index] = "X";
+        const cells = document.querySelectorAll('.cell');
+        cells[index].innerText = "X";
+        cells[index].classList.add("x");
+
+        checkResult();
+
+        if (isGameActive) {
+            document.getElementById('game-status').innerText = "Computer is thinking...";
+            setTimeout(computerMove, 500); // Computer logic
+        }
+    }
+
+    function computerMove() {
+        if (!isGameActive) return;
+
+        // Smart block/win move scanner
+        let moveFound = false;
+
+        // Win if possible, else Block user
+        moveFound = trySmartMove("O") || trySmartMove("X");
+
+        if (!moveFound) {
+            // Pick a random available cell
+            let availableMoves = [];
+            for (let i = 0; i < gameState.length; i++) {
+                if (gameState[i] === "") availableMoves.push(i);
+            }
+            if (availableMoves.length > 0) {
+                let randomChoice = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+                gameState[randomChoice] = "O";
+                const cells = document.querySelectorAll('.cell');
+                cells[randomChoice].innerText = "O";
+                cells[randomChoice].classList.add("o");
+            }
+        }
+
+        checkResult();
+        if (isGameActive) {
+            document.getElementById('game-status').innerText = "You are 'X'. It's your turn!";
+        }
+    }
+
+    function trySmartMove(playerToSimulate) {
+        for (let condition of winningConditions) {
+            let match = condition.map(idx => gameState[idx]);
+            let occupied = match.filter(val => val === playerToSimulate).length;
+            let emptyCount = match.filter(val => val === "").length;
+
+            if (occupied === 2 && emptyCount === 1) {
+                let emptyIndex = condition[match.indexOf("")];
+                gameState[emptyIndex] = "O";
+                const cells = document.querySelectorAll('.cell');
+                cells[emptyIndex].innerText = "O";
+                cells[emptyIndex].classList.add("o");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function checkResult() {
+        let won = false;
+        
+        // Check rows, columns, and diagonals for a match
+        for (let condition of winningConditions) {
+            let a = gameState[condition[0]];
+            let b = gameState[condition[1]];
+            let c = gameState[condition[2]];
+            
+            if (a === "" || b === "" || c === "") continue;
+            
+            if (a === b && b === c) {
+                won = true;
+                break; // We found a winner!
+            }
+        }
+
+        const statusDisplay = document.getElementById('game-status');
+
+        if (won) {
+            // Because the CPU moves after the player, we deduce who won based on the last move
+            statusDisplay.innerText = gameState.filter(x => x === 'X').length > gameState.filter(x => x === 'O').length 
+                ? "🎉 You Win!" 
+                : "🤖 Computer Wins!";
+            isGameActive = false;
+            return;
+        }
+
+        // Check for a draw (no empty spaces left)
+        if (!gameState.includes("")) {
+            statusDisplay.innerText = "🤝 It's a Draw!";
+            isGameActive = false;
+        }
+    }
+
+    function resetGame() {
+        gameState = ["", "", "", "", "", "", "", "", ""];
+        isGameActive = true;
+        
+        const statusDisplay = document.getElementById('game-status');
+        statusDisplay.innerText = "You are 'X'. It's your turn!";
+        
+        const cells = document.querySelectorAll('.cell');
+        cells.forEach(cell => {
+            cell.innerText = "";
+            cell.classList.remove("x");
+            cell.classList.remove("o");
+        });
+    }
+
+    // Initialize the Clock inside your Taskbar
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('time').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        document.getElementById('date').innerText = now.toLocaleDateString();
+    }
+    
+    setInterval(updateClock, 1000);
+    updateClock(); // Run immediately on load
+	
+	function deleteFile(index) {
+    let file = fileSystem.docs.splice(index, 1)[0];
+    fileSystem.recycle.push(file);
+    saveFS();
+    showDir('docs');
+    showRecycle();
+}
+	let fileSystem = JSON.parse(localStorage.getItem('fs')) || {
+    desktop: [],
+    docs: [],
+    recycle: []
+};
+
+function saveFS() {
+    localStorage.setItem('fs', JSON.stringify(fileSystem));
+}
+  </script>
+        if (!won && !gameState.includes("")) {
+            isGameActive = false;
+            document.getElementById('game-status').innerText = "🤝 Draw Match!";
+        }
+    }
+
+    function resetGame() {
+        gameState = ["", "", "", "", "", "", "", "", ""];
+        isGameActive = true;
+        document.getElementById('game-status').innerText = "You are 'X'. It's your turn!";
+        document.querySelectorAll('.cell').forEach(cell => {
+            cell.innerText = "";
+            cell.classList.remove("x");
+            cell.classList.remove("o");
+        });
+    }
+
+    /* Live Clock and Date */
+    setInterval(() => {
+        const now = new Date();
+        document.getElementById('time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('date').innerText = now.toLocaleDateString();
+    }, 1000);
+
+    /* Close start menu on outside click */
+    document.addEventListener('click', () => {
+        document.getElementById('start-menu').style.display = 'none';
+    });
+
+    /* Local Storage Integration for Notepad */
+    document.getElementById('notepad-text').addEventListener('input', function(){
+      localStorage.setItem('saved_note', this.value);
+    });
+
+    window.onload = function() {
+        document.getElementById('notepad-text').value = localStorage.getItem('saved_note') || '';
+        
+        /* Drag-Drop Logic */
+        document.querySelectorAll('.window-header').forEach(header => {
+            header.onmousedown = function(e) {
+                if (e.target.classList.contains('win-btn')) return; 
+                
+                let win = header.parentElement;
+                if (win.style.width === "100%") return; 
+                
+                bringToFront(win);
+
+                let shiftX = e.clientX - win.getBoundingClientRect().left;
+                let shiftY = e.clientY - win.getBoundingClientRect().top;
+
+                function moveAt(pageX, pageY) {
+                    win.style.left = (pageX - shiftX) + 'px';
+                    win.style.top = (pageY - shiftY) + 'px';
+                }
+
+                function onMouseMove(event) {
+                    moveAt(event.pageX, event.pageY);
+                }
+
+                document.addEventListener('mousemove', onMouseMove);
+
+                document.onmouseup = function() {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.onmouseup = null;
+                };
+            };
+            header.ondragstart = function() { return false; };
+        });
+    };
+  </script>
+</body>
+</html>
